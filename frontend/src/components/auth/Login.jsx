@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
-import { setLoading, setUser } from '@/redux/authSlice';
 import { USER_API_END_POINT } from '@/utils/constant';
 
 const Login = () => {
   const [input, setInput] = useState({ email: "", password: "", role: "" });
-  const { loading, user } = useSelector(state => state.auth);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
@@ -17,26 +14,32 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(setLoading(true));
+    setLoading(true);
+
     try {
       const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
         headers: { "Content-Type": "application/json" },
-        withCredentials: true,
+        withCredentials: true, // send cookies like JWT
       });
+
       if (res.data.success) {
-        dispatch(setUser(res.data.user));
-        navigate("/");
+        // Save user to localStorage
+        localStorage.setItem("user", JSON.stringify(res.data.user));
         alert("Login successful");
+        navigate("/");
       }
     } catch (err) {
       alert(err.response?.data?.message || "Login failed");
     } finally {
-      dispatch(setLoading(false));
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (user) navigate("/");
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      navigate("/");
+    }
   }, []);
 
   return (
