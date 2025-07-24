@@ -1,37 +1,51 @@
-import React from 'react'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from './ui/table'
-import { Badge } from './ui/badge'
-import { useSelector } from 'react-redux'
+import React from 'react';
 
-const AppliedJobTable = () => {
-    const {allAppliedJobs} = useSelector(store=>store.job);
-    return (
-        <div>
-            <Table>
-                <TableCaption>A list of your applied jobs</TableCaption>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Job Role</TableHead>
-                        <TableHead>Company</TableHead>
-                        <TableHead className="text-right">Status</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {
-                        allAppliedJobs.length <= 0 ? <span>You haven't applied any job yet.</span> : allAppliedJobs.map((appliedJob) => (
-                            <TableRow key={appliedJob._id}>
-                                <TableCell>{appliedJob?.createdAt?.split("T")[0]}</TableCell>
-                                <TableCell>{appliedJob.job?.title}</TableCell>
-                                <TableCell>{appliedJob.job?.company?.name}</TableCell>
-                                <TableCell className="text-right"><Badge className={`${appliedJob?.status === "rejected" ? 'bg-red-400' : appliedJob.status === 'pending' ? 'bg-gray-400' : 'bg-green-400'}`}>{appliedJob.status.toUpperCase()}</Badge></TableCell>
-                            </TableRow>
-                        ))
-                    }
-                </TableBody>
-            </Table>
-        </div>
-    )
-}
+const AppliedJobTable = ({ allAppliedJobs = [] }) => {
+  return (
+    <div style={{ maxWidth: "800px", margin: "30px auto" }}>
+      <h3>A list of your applied jobs</h3>
+      {allAppliedJobs.length === 0 ? (
+        <p>You haven't applied to any job yet.</p>
+      ) : (
+        <table border="1" cellPadding="10" cellSpacing="0" width="100%">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Job Role</th>
+              <th>Company</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {allAppliedJobs.map((appliedJob) => (
+              <tr key={appliedJob._id}>
+                <td>{appliedJob?.createdAt?.split("T")[0]}</td>
+                <td>{appliedJob?.job?.title}</td>
+                <td>{appliedJob?.job?.company?.name}</td>
+                <td>
+                  <span
+                    style={{
+                      padding: "5px 10px",
+                      color: "white",
+                      backgroundColor:
+                        appliedJob.status === 'rejected'
+                          ? 'red'
+                          : appliedJob.status === 'pending'
+                          ? 'gray'
+                          : 'green',
+                      borderRadius: "5px"
+                    }}
+                  >
+                    {appliedJob.status?.toUpperCase()}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+};
 
-export default AppliedJobTable
+export default AppliedJobTable;
